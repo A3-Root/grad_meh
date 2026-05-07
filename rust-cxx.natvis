@@ -4,7 +4,7 @@
         <DisplayString>{ (char*)repr[1],s8 }</DisplayString>
         <StringView>(char*)repr[1],s8</StringView>
     </Type>
-    <Type Name="rust::Vec&lt;*&gt;">
+    <Type Name="rust::cxxbridge1::Vec&lt;*&gt;">
         <DisplayString>{{size = {repr[2]}}}</DisplayString>
         <Expand>
             <Item Name="[size]">repr[2]</Item>

@@ -1,5 +1,7 @@
 # Gruppe Adler Map Exporter
 
+Added Baked Topo
+
 Gruppe Adler Map Exporter (grad_meh) is an Arma 3 modification built on [intercept](https://github.com/intercept/intercept), which allows exporting Arma 3 maps.  
 If you wonder what the `h` stands for you should check out [this pull request](https://github.com/gruppe-adler/grad_meh/pull/1).   
 

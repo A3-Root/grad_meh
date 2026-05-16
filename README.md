@@ -6,6 +6,8 @@ If you wonder what the `h` stands for you should check out [this pull request](h
 The aim of this project is not to generate finished map tiles for a [WMTS](https://en.wikipedia.org/wiki/Web_Map_Tile_Service), but to export all data that might be needed to generate such tiles or basically anything else. So the goal is to export everything interesting about an Arma 3 map. What you do with that data is up to you. The use cases are only limited by your imagination (ﾉ◕ヮ◕)ﾉ*:・ﾟ✧  
   
 The [output section](#Output) outlines what exactly is exported.  
+
+Build instructions and web-map integration notes are available in [docs/web_map_handoff.md](./docs/web_map_handoff.md).
   
 Check out our [FAQ](#FAQ) at the bottom of this README if you ask yourself "How?" or "Why?".
 
@@ -45,11 +47,13 @@ Gruppe Adler Map Exporter adds two script commands, which are used by the UI. If
 |---|---|  
 |Description| Start export of given map. |
 |||
-|Syntax| **gradMehExportMap** [mapId, sat, geojson, previewImg, meta, dem]
+|Syntax| **gradMehExportMap** [mapId, sat, topo, bakedTopo, geojson, previewImg, meta, dem]
 |||
-|Parameters|[mapId, sat, geojson, previewImg, meta, dem]: [Array](https://community.bistudio.com/wiki/Array)|
+|Parameters|[mapId, sat, topo, bakedTopo, geojson, previewImg, meta, dem]: [Array](https://community.bistudio.com/wiki/Array)|
 ||mapId: [String](https://community.bistudio.com/wiki/String) - CfgWorlds class name of map|
-||sat: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export sat images|
+||sat: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export sat images and zoom tiles|
+||topo: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export generated topographic image and zoom tiles|
+||bakedTopo: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export topographic image with available map features baked in|
 ||geojson: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export GeoJSONs|
 ||previewImg: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export preview image|
 ||meta: [Boolean](https://community.bistudio.com/wiki/Boolean) - Export meta.json|
@@ -57,7 +61,7 @@ Gruppe Adler Map Exporter adds two script commands, which are used by the UI. If
 |||
 |Return Value| [Number](https://community.bistudio.com/wiki/Number) - Status code<br>`0` - Export process started nominally<br>`1` - Error: Invalid arguments given<br>`2` - Error: Another export is currently running<br>`3` - Error: Map wasn't found in config file<br>`4` - Error: Map invalid because `worldSize` field in config is missing<br>`5` - Error: PBO of map's WRP not found (Most likely because it is an EBO)<br>`6` - Error: PBO map still populating (MEH has to do this once upon game start, before it can export anything)
 |||
-|Examples|`gradMehExportMap ["Stratis", true, true, true, true, true];`|  
+|Examples|`gradMehExportMap ["Stratis", true, true, true, true, true, true, true];`|  
 
 ### `gradMehExportRunning`
 |**Syntax**| |  

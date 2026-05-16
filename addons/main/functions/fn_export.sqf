@@ -5,10 +5,12 @@
  * Arguments:
  * 0: Maps to export <ARRAY>
  * 1: Export sat images (Optional, Default: true) <BOOLEAN>
- * 2: Export houses / locations (Optional, Default: true) <BOOLEAN>
- * 3: Export preview image (Optional, Default: true) <BOOLEAN>
- * 4: Export meta.json (Optional, Default: true) <BOOLEAN>
- * 5: Export digital elevation model (Optional, Default: true) <BOOLEAN>
+ * 2: Export topographic image (Optional, Default: true) <BOOLEAN>
+ * 3: Export baked topographic image (Optional, Default: true) <BOOLEAN>
+ * 4: Export houses / locations (Optional, Default: true) <BOOLEAN>
+ * 5: Export preview image (Optional, Default: true) <BOOLEAN>
+ * 6: Export meta.json (Optional, Default: true) <BOOLEAN>
+ * 7: Export digital elevation model (Optional, Default: true) <BOOLEAN>
  *
  * Return Value:
  * NONE
@@ -24,6 +26,8 @@
 params [
 	["_maps", [], []],
 	["_exportSat", true, [true]],
+	["_exportTopo", true, [true]],
+	["_exportBakedTopo", true, [true]],
 	["_exportHouses", true, [true]],
 	["_exportPreviewImg", true, [true]],
 	["_exportMeta", true, [true]],
@@ -43,6 +47,8 @@ private _cancelSteps = {
 
 // set step to canceled if it is turned off
 if (!_exportSat) then { ["write_sat", _maps] call _cancelSteps; };
+if (!_exportTopo) then { ["write_topo", _maps] call _cancelSteps; };
+if (!_exportBakedTopo) then { ["write_baked_topo", _maps] call _cancelSteps; };
 if (!_exportHouses) then { ["write_houses", _maps] call _cancelSteps; };
 if (!_exportPreviewImg) then { ["write_preview", _maps] call _cancelSteps; };
 if (!_exportMeta) then { ["write_meta", _maps] call _cancelSteps; };
@@ -57,6 +63,8 @@ playScriptedMission [
 			params [
 				["_maps", [], []],
 				["_exportSat", true, [true]],
+				["_exportTopo", true, [true]],
+				["_exportBakedTopo", true, [true]],
 				["_exportHouses", true, [true]],
 				["_exportPreviewImg", true, [true]],
 				["_exportMeta", true, [true]],
@@ -95,6 +103,8 @@ playScriptedMission [
 					private _status = gradMehExportMap [
 						_x,
 						_exportSat,
+						_exportTopo,
+						_exportBakedTopo,
 						_exportHouses,
 						_exportPreviewImg,
 						_exportMeta,

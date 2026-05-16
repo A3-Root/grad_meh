@@ -24,6 +24,8 @@ params ["_display", "_parentGrp", "_worldName"];
 private _STEPS = [
 	["read_wrp", IDC_LOADINGITEM_STEP_READWRP],
 	["write_sat", IDC_LOADINGITEM_STEP_SATIMAGE],
+	["write_topo", IDC_LOADINGITEM_STEP_TOPOIMAGE],
+	["write_baked_topo", IDC_LOADINGITEM_STEP_BAKEDTOPOIMAGE],
 	["write_houses", IDC_LOADINGITEM_STEP_HOUSES],
 	["write_preview", IDC_LOADINGITEM_STEP_PREVIEWIMGE],
 	["write_meta", IDC_LOADINGITEM_STEP_META],

@@ -1,7 +1,7 @@
 #define ROW_HEIGHT 3
 #define ROW_Y(index) ((SPACING + index * ROW_HEIGHT) * GRID_H)
 #define DIALOG_WIDTH (50 * GRID_W)
-#define DIALOG_HEIGHT (ROW_Y(5) + SPACING * GRID_H)
+#define DIALOG_HEIGHT (ROW_Y(7) + SPACING * GRID_H)
 #define DIALOG_TITLE "Gruppe Adler MEH"
 #define DIALOG_NON_SCROLLABLE true
 
@@ -37,8 +37,30 @@ class grad_meh_config {
 			};
 		};
 	};
-	class houses: sat {
+	class topo: sat {
 		y = ROW_Y(1);
+		class Controls: Controls {
+			class check: check {
+				idc = IDC_CONFIG_CHECK_TOPO;
+			};
+			class text: text {
+				text = "Export topographic image";
+			};
+		};
+	};
+	class bakedTopo: sat {
+		y = ROW_Y(2);
+		class Controls: Controls {
+			class check: check {
+				idc = IDC_CONFIG_CHECK_BAKEDTOPO;
+			};
+			class text: text {
+				text = "Export baked topography";
+			};
+		};
+	};
+	class houses: sat {
+		y = ROW_Y(3);
 		class Controls: Controls {
 			class check: check {
 				idc = IDC_CONFIG_CHECK_HOUSES;
@@ -49,7 +71,7 @@ class grad_meh_config {
 		};
 	};
 	class preview: sat {
-		y = ROW_Y(2);
+		y = ROW_Y(4);
 		class Controls: Controls {
 			class check: check {
 				idc = IDC_CONFIG_CHECK_PREVIEW;
@@ -60,7 +82,7 @@ class grad_meh_config {
 		};
 	};
 	class meta: sat {
-		y = ROW_Y(3);
+		y = ROW_Y(5);
 		class Controls: Controls {
 			class check: check {
 				idc = IDC_CONFIG_CHECK_META;
@@ -71,7 +93,7 @@ class grad_meh_config {
 		};
 	};
 	class dem: sat {
-		y = ROW_Y(4);
+		y = ROW_Y(6);
 		class Controls: Controls {
 			class check: check {
 				idc = IDC_CONFIG_CHECK_DEM;

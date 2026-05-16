@@ -3,6 +3,7 @@
 #include "util.h"
 #include "geojsons.h"
 #include "satimages.h"
+#include "topoimages.h"
 
 #include "version.h"
 
@@ -230,7 +231,7 @@ bool writePreviewImage(const std::string &worldName, std::filesystem::path &base
     }
 }
 
-void extractMap(const std::string &worldName, const std::string &worldPath, std::array<bool, 5> &steps)
+void extractMap(const std::string &worldName, const std::string &worldPath, std::array<bool, 7> &steps)
 {
 
     auto lowerWorldName = boost::algorithm::to_lower_copy(worldName);
@@ -238,6 +239,8 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
     auto basePath = fs::path("grad_meh") / lowerWorldName;
     auto basePathGeojson = fs::path("grad_meh") / lowerWorldName / "geojson";
     auto basePathSat = fs::path("grad_meh") / lowerWorldName / "sat";
+    auto basePathTopo = fs::path("grad_meh") / lowerWorldName / "topo";
+    auto basePathBakedTopo = fs::path("grad_meh") / lowerWorldName / "baked_topo";
 
     std::stringstream startMsg;
     startMsg << "Starting export of " << worldName << " [";
@@ -268,6 +271,14 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
     {
         fs::create_directories(basePathSat);
     }
+    if (!fs::exists(basePathTopo))
+    {
+        fs::create_directories(basePathTopo);
+    }
+    if (!fs::exists(basePathBakedTopo))
+    {
+        fs::create_directories(basePathBakedTopo);
+    }
 
     std::string curWorldPath = "";
     try {
@@ -281,7 +292,7 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
         auto wrp = arma_file_formats::cxx::OprwCxx{};
         // wrp.wrpName = worldName + ".wrp";
 
-        if (steps[0] || steps[1] || steps[3] || steps[4])
+        if (steps[0] || steps[1] || steps[2] || steps[3] || steps[5] || steps[6])
         {
             reportStatus(worldName, "read_wrp", "running");
             wrp = arma_file_formats::cxx::create_wrp_from_vec(wrp_data);
@@ -303,13 +314,27 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
         }
         if (steps[1])
         {
+            reportStatus(worldName, "write_topo", "running");
+            prettyDiagLog("Exporting topographic images");
+            writeTopoImages(wrp, basePathTopo);
+            reportStatus(worldName, "write_topo", "done");
+        }
+        if (steps[2])
+        {
+            reportStatus(worldName, "write_baked_topo", "running");
+            prettyDiagLog("Exporting baked topographic images");
+            writeBakedTopoImages(wrp, basePathBakedTopo);
+            reportStatus(worldName, "write_baked_topo", "done");
+        }
+        if (steps[3])
+        {
             reportStatus(worldName, "write_houses", "running");
             prettyDiagLog("Exporting geojson");
             writeGeojsons(wrp, basePathGeojson, worldName);
             reportStatus(worldName, "write_houses", "done");
         }
 
-        if (steps[2])
+        if (steps[4])
         {
             reportStatus(worldName, "write_preview", "running");
             prettyDiagLog("Exporting preview image");
@@ -320,7 +345,7 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
             }
         }
 
-        if (steps[3])
+        if (steps[5])
         {
             reportStatus(worldName, "write_meta", "running");
             prettyDiagLog("Exporting meta json");
@@ -328,7 +353,7 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
             reportStatus(worldName, "write_meta", "done");
         }
 
-        if (steps[4])
+        if (steps[6])
         {
             reportStatus(worldName, "write_dem", "running");
             prettyDiagLog("Exporting dem file");
@@ -362,8 +387,8 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
 
     std::string worldName;
 
-    // [sat image, houses, preview img, meta.json, dem.asc]
-    std::array<bool, 5> steps = { true, true, true, true, true };
+    // [sat image, topo image, baked topo image, houses, preview img, meta.json, dem.asc]
+    std::array<bool, 7> steps = { true, true, true, true, true, true, true };
 
     if (rightArg.type_enum() == game_data_type::STRING)
     {
@@ -373,7 +398,7 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
     {
         auto parArray = rightArg.to_array();
 
-        if (parArray.size() <= 0 || parArray.size() >= 7)
+        if (parArray.size() <= 0 || parArray.size() >= 9)
         {
             gs.set_script_error(iet::assertion_failed, "Wrong amount of arguments!"sv);
             return GRAD_MEH_STATUS_ERR_ARGS;
@@ -383,7 +408,6 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
         {
 
             worldName = r_string(parArray[0]);
-
             for (int i = 1; i < parArray.size(); i++)
             {
                 if (parArray[i].type_enum() == game_data_type::BOOL)

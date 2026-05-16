@@ -11,6 +11,57 @@ using namespace OpenImageIO_v2_5;
 #include <boost/algorithm/string/join.hpp>
 
 #include <memory>
+#include <cmath>
+
+void writeImagePyramid(const ImageBuf& src, const fs::path& basePath, const int32_t tileSize)
+{
+    if (!fs::exists(basePath)) {
+        fs::create_directories(basePath);
+    }
+
+    auto levelImage = src.copy(TypeDesc::UINT8);
+    int32_t z = 0;
+
+    while (levelImage.spec().width >= tileSize || levelImage.spec().height >= tileSize || z == 0) {
+        const auto width = levelImage.spec().width;
+        const auto height = levelImage.spec().height;
+        const auto cols = static_cast<int32_t>(std::ceil(static_cast<float>(width) / tileSize));
+        const auto rows = static_cast<int32_t>(std::ceil(static_cast<float>(height) / tileSize));
+
+        auto zPath = basePath / std::to_string(z);
+        if (!fs::exists(zPath)) {
+            fs::create_directories(zPath);
+        }
+
+        for (int32_t x = 0; x < cols; x++) {
+            auto xPath = zPath / std::to_string(x);
+            if (!fs::exists(xPath)) {
+                fs::create_directories(xPath);
+            }
+
+            for (int32_t y = 0; y < rows; y++) {
+                ImageBuf tile(ImageSpec(tileSize, tileSize, levelImage.spec().nchannels, TypeDesc::UINT8));
+                auto roi = ROI(
+                    x * tileSize,
+                    std::min((x + 1) * tileSize, width),
+                    y * tileSize,
+                    std::min((y + 1) * tileSize, height));
+                auto cut = ImageBufAlgo::cut(levelImage, roi);
+                ImageBufAlgo::paste(tile, 0, 0, 0, 0, cut);
+                tile.write((xPath / std::to_string(y).append(".png")).string());
+            }
+        }
+
+        const auto nextWidth = std::max(1, width / 2);
+        const auto nextHeight = std::max(1, height / 2);
+        if (nextWidth == width && nextHeight == height) {
+            break;
+        }
+
+        levelImage = ImageBufAlgo::resize(levelImage, "", 0, ROI(0, nextWidth, 0, nextHeight));
+        z++;
+    }
+}
 
 struct SatMapTile {
     fs::path path = {};
@@ -292,6 +343,8 @@ void writeSatImages(arma_file_formats::cxx::OprwCxx& wrp, const int32_t& worldSi
                     out.write((curWritePath / std::to_string(j).append(".png")).string());
                 }
             });
+
+            writeImagePyramid(dst, basePathSat / "tiles");
         }
         catch (const rust::Error& ex) {
             PLOG_ERROR << fmt::format("Exception in writeSatImages PBO: {}", pboPath);

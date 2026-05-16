@@ -8,7 +8,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 	x = SPACING * GRID_W;
 	y = SPACING * GRID_H;
 	w = LOADING_STEP_W;
-	h = STEP_Y(6) + BOTTOM_MARGIN * GRID_H;
+	h = STEP_Y(8) + BOTTOM_MARGIN * GRID_H;
 	class Controls {
 		class name: ctrlStatic {
 			idc = IDC_LOADINGITEM_NAME;
@@ -38,9 +38,29 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 				};
 			};
 		};
+		class topoImage: grad_meh_loadingStep {
+			idc = IDC_LOADINGITEM_STEP_TOPOIMAGE;
+			y = STEP_Y(2);
+			class Controls: Controls {
+				class done: done {};
+				class text: text {
+					text = "Export topographic image";
+				};
+			};
+		};
+		class bakedTopoImage: grad_meh_loadingStep {
+			idc = IDC_LOADINGITEM_STEP_BAKEDTOPOIMAGE;
+			y = STEP_Y(3);
+			class Controls: Controls {
+				class done: done {};
+				class text: text {
+					text = "Export baked topography";
+				};
+			};
+		};
 		class houses: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_HOUSES;
-			y = STEP_Y(2);
+			y = STEP_Y(4);
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -50,7 +70,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class previewImage: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_PREVIEWIMGE;
-			y = STEP_Y(3);
+			y = STEP_Y(5);
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -60,7 +80,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class meta: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_META;
-			y = STEP_Y(4);
+			y = STEP_Y(6);
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -70,7 +90,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class dem: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_DEM;
-			y = STEP_Y(5);
+			y = STEP_Y(7);
 			class Controls: Controls {
 				class done: done {};
 				class text: text {

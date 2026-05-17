@@ -271,18 +271,6 @@ bool processArmaTopo(const fs::path& basePath, const std::string& lowerWorldName
         scriptOut << armaTopoProcessorScript;
     }
 
-    const auto localCommand = "py -3 " + quoteCommandArg(scriptPath)
-        + " " + quoteCommandArg(basePath)
-        + " " + quoteCommandArg(lowerWorldName)
-        + " " + quoteCommandArg(std::to_string(worldSize));
-
-    auto result = std::system(localCommand.c_str());
-    if (result == 0) {
-        return true;
-    }
-
-    PLOG_WARNING << fmt::format("Local Arma topo processor failed with exit code {}. Trying Docker fallback.", result);
-
     const auto dockerCommand = "docker run --rm"
         " -v " + quoteCommandArg(fs::absolute(basePath).string() + ":/data/map")
         + " -v " + quoteCommandArg(fs::absolute(scriptPath).string() + ":/app/process_arma_topo.py:ro")
@@ -291,7 +279,7 @@ bool processArmaTopo(const fs::path& basePath, const std::string& lowerWorldName
         + " " + quoteCommandArg(lowerWorldName)
         + " " + quoteCommandArg(std::to_string(worldSize));
 
-    result = std::system(dockerCommand.c_str());
+    const auto result = std::system(dockerCommand.c_str());
     if (result != 0) {
         PLOG_ERROR << fmt::format("Docker Arma topo processor failed with exit code {}", result);
         return false;

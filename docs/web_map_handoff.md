@@ -66,7 +66,7 @@ The UI also exposes `Export Arma map SVG topo source`. This is the OCAP-style ca
 1. It launches each selected world as a scripted mission and captures that world's diagnostic SVG with Arma's `diag_exportTerrainSVG`.
 2. It launches VR and runs the normal `grad_meh` WRP/PBO bulk export. During this phase the DLL processes each captured SVG plus `dem.asc.gz` into OCAP-style raster tiles.
 
-The processor first tries local Windows tools on PATH. If that fails, it falls back to Docker and runs the same generated processor script in the `grad-meh-arma-topo:latest` image.
+The processor always uses Docker and runs the generated processor script in the `grad-meh-arma-topo:latest` image. Host Inkscape/GDAL/ImageMagick installs are intentionally ignored so the output is not affected by local toolchain drift.
 
 Build the Docker image once from the repository root:
 
@@ -74,7 +74,7 @@ Build the Docker image once from the repository root:
 docker build -t grad-meh-arma-topo:latest -f tools\arma-topo-render\Dockerfile tools\arma-topo-render
 ```
 
-With Docker available, the Windows host only needs `docker` on PATH for the OCAP-style processing phase. Without Docker, the Windows PATH used by Arma must contain `py -3`, `inkscape`, `gdaldem`, `gdal2tiles.py` or `gdal2tiles`, and `magick`.
+The Windows host only needs `docker` on PATH for the OCAP-style processing phase.
 
 ## Output Layout
 
@@ -155,7 +155,7 @@ Arma/OCAP-style topography:
 - `arma_topo_dark/tiles/{z}/{x}/{y}.png` is the dark SVG variant.
 - `arma_topo_relief/tiles/{z}/{x}/{y}.png` composites the Arma non-land features over DEM hillshade.
 - `arma_color_relief/tiles/{z}/{x}/{y}.png` composites the Arma non-land features over DEM color relief.
-- Processing uses local Windows tools first, then Docker fallback. The Docker fallback requires the `grad-meh-arma-topo:latest` image built from `tools/arma-topo-render/Dockerfile`.
+- Processing always uses Docker. It requires the `grad-meh-arma-topo:latest` image built from `tools/arma-topo-render/Dockerfile`.
 
 Tile coordinates use image-space origin:
 

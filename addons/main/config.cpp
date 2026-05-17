@@ -9,7 +9,7 @@ class CfgPatches {
 		requiredAddons[] = { "intercept_core" };
 		authors[] = { "Willard", "DerZade" };
 		url = "";
-		VERSION_CONFIG;
+		version = 2.14;
 	};
 };
 

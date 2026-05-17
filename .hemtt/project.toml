@@ -1,0 +1,35 @@
+name = "grad_meh"
+prefix = "grad_meh"
+mainprefix = "x"
+author = "Gruppe Adler"
+folder_optionals = false
+[files]
+include = [
+    "mod.cpp",
+    "logo_active_ca.paa",
+    "logo_ca.paa",
+    "overview_co.paa",
+    "logo_small_ca.paa",
+    "LICENSE",
+    "README.md"
+]
+exclude = [
+    ".gitignore",
+    ".editorconfig",
+    "*.md",
+    "*.json",
+]
+
+key_name = "{{prefix}}-{{version}}"
+authority = "{{version}}"
+
+releasebuild = [
+  "!copyInterceptPlugin"
+]
+
+[scripts.copyInterceptPlugin]
+steps_windows = [
+    'xcopy build\lib64\*.dll releases\\{{version}}\@{{prefix}}\intercept\ /Y /F'
+]
+
+show_output = true

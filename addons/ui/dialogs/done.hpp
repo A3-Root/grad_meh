@@ -5,7 +5,7 @@
 
 class grad_meh_done {
 	idd = -1;
-	onUnLoad = "_this call (uiNamespace getVariable 'grad_meh_fnc_done_onUnLoad');";
+	onUnLoad = "call (uiNamespace getVariable 'grad_meh_fnc_done_onUnLoad');";
 	movingEnable = false;
 	#include "base\start.hpp"
 	class text: ctrlStructuredText {

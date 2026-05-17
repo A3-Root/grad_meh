@@ -113,6 +113,33 @@ target_link_libraries(${INTERCEPT_PLUGIN_NAME} plog::plog)
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} rust-lib)
 
 if(MSVC)
+    get_filename_component(MSVC_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+    get_filename_component(MSVC_TOOL_DIR "${MSVC_BIN_DIR}/../../.." ABSOLUTE)
+    set(MSVC_ATL_SEARCH_PATHS
+        "${MSVC_TOOL_DIR}/atlmfc/lib/spectre/x64"
+        "${MSVC_TOOL_DIR}/atlmfc/lib/x64"
+        "$ENV{VCToolsInstallDir}/atlmfc/lib/spectre/x64"
+        "$ENV{VCToolsInstallDir}/atlmfc/lib/x64"
+    )
+    unset(MSVC_ATLS_LIB)
+    foreach(MSVC_ATL_SEARCH_PATH IN LISTS MSVC_ATL_SEARCH_PATHS)
+        if(EXISTS "${MSVC_ATL_SEARCH_PATH}/atls.lib")
+            set(MSVC_ATLS_LIB "${MSVC_ATL_SEARCH_PATH}/atls.lib")
+            break()
+        endif()
+    endforeach()
+    if(NOT MSVC_ATLS_LIB)
+        string(REPLACE ";" "\n  " MSVC_ATL_SEARCH_PATHS_TEXT "${MSVC_ATL_SEARCH_PATHS}")
+        message(FATAL_ERROR "MSVC ATL library atls.lib was not found for the active compiler '${CMAKE_CXX_COMPILER}'. Checked:\n  ${MSVC_ATL_SEARCH_PATHS_TEXT}\nInstall the matching ATL component for this exact MSVC toolset, or run from a developer terminal for a toolset that has ATL installed.")
+    endif()
+    string(FIND "${MSVC_ATLS_LIB}" "${MSVC_TOOL_DIR}" MSVC_ATL_IN_ACTIVE_TOOLSET)
+    if(MSVC_ATL_IN_ACTIVE_TOOLSET EQUAL -1)
+        message(FATAL_ERROR "MSVC ATL library atls.lib was found at '${MSVC_ATLS_LIB}', but the active compiler is '${CMAKE_CXX_COMPILER}'. These must come from the same MSVC toolset. Delete the build directory and reconfigure from the intended x64 Visual Studio developer terminal.")
+    endif()
+    message(STATUS "MSVC compiler: ${CMAKE_CXX_COMPILER}")
+    message(STATUS "MSVC linker: ${CMAKE_LINKER}")
+    message(STATUS "MSVC ATL: ${MSVC_ATLS_LIB}")
+
 	target_link_libraries(${INTERCEPT_PLUGIN_NAME} ntdll.lib)
 
 	# Required for a debug build since these will be optimized away in relase mode,
@@ -166,4 +193,3 @@ if(NOT "${PLUGIN_FOLDER}" STREQUAL "")
 endif()
 
 install(TARGETS ${INTERCEPT_PLUGIN_NAME} RUNTIME DESTINATION bin)
-

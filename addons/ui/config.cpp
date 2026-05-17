@@ -9,7 +9,7 @@ class CfgPatches {
 		requiredAddons[] = { "grad_meh_main" };
 		authors[] = { "Willard", "DerZade" };
 		url = "";
-		VERSION_CONFIG;
+		version = 2.14;
 	};
 };
 
@@ -19,7 +19,6 @@ class ctrlStaticPictureKeepAspect;
 class ctrlControlsGroupNoHScrollbars;
 class ctrlButton;
 class ctrlCheckbox;
-class ctrlButtonSearch;
 class ctrlStructuredText;
 class ctrlStaticBackground;
 class ctrlStaticTitle;

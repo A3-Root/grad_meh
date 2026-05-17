@@ -7,7 +7,7 @@ class grad_meh_loading {
 	idd = -1;
 	movingEnable = false;
 	onLoad = "uiNamespace setVariable ['grad_meh_loadingDisplay', (_this select 0)];";
-	onUnLoad = "_this call (uiNamespace getVariable 'grad_meh_fnc_loading_onUnLoad');";
+	onUnLoad = "call (uiNamespace getVariable 'grad_meh_fnc_loading_onUnLoad');";
 	#include "base\start.hpp"
 	#include "base\end.hpp"
 };

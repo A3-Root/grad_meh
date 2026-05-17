@@ -496,7 +496,7 @@ void intercept::pre_start()
     grad_meh_export_running =
         client::host::register_sqf_command("gradMehExportRunning", "Check if an export is currently running", exportRunningCommand, game_data_type::BOOL);
 
-#if WIN32
+#if defined(_WIN32)
     std::filesystem::path a3_log_path;
     PWSTR path_tmp;
 

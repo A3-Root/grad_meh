@@ -57,7 +57,7 @@ class grad_meh_mapItem: ctrlControlsGroupNoScrollbars {
 			colorBackgroundActive[]={0,0,0,0};
 			onMouseEnter=QUOTE(params ['_c']; ((ctrlParentControlsGroup _c) controlsGroupCtrl IDC_MAPITEM_BACKGROUND) ctrlShow true;);
 			onMouseExit=QUOTE(params ['_c']; ((ctrlParentControlsGroup _c) controlsGroupCtrl IDC_MAPITEM_BACKGROUND) ctrlShow false;);
-			onMouseButtonClick="_this call (uiNamespace getVariable 'grad_meh_fnc_mapItem_onClick');";
+			onMouseButtonClick="call (uiNamespace getVariable 'grad_meh_fnc_mapItem_onClick');";
 		};
 	};
 };

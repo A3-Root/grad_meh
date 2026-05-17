@@ -8,8 +8,8 @@
 class grad_meh_config {
 	idd = -1;
 	movingEnable = false;
-	onLoad = "_this call (uiNamespace getVariable 'grad_meh_fnc_config_onLoad');";
-	onUnLoad = "_this call (uiNamespace getVariable 'grad_meh_fnc_config_onUnLoad');";
+	onLoad = "call (uiNamespace getVariable 'grad_meh_fnc_config_onLoad');";
+	onUnLoad = "call (uiNamespace getVariable 'grad_meh_fnc_config_onUnLoad');";
 	#include "base\start.hpp"
 	class sat: ctrlControlsGroupNoScrollbars {
 		x = SPACING * GRID_W;

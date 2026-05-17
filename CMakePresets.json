@@ -23,9 +23,7 @@
           "value": "${sourceDir}/install"
         },
         "USE_64BIT_BUILD": true,
-        "USE_STATIC_LINKING": true,
-        "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl"
+        "USE_STATIC_LINKING": true
       },
       "condition": {
         "type": "equals",

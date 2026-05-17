@@ -33,7 +33,7 @@ The `sat/` directory includes the satellite image. Because the full image can ea
 
 Each tile within the `sat/` directory has the following nomenclature `{col}/{row}.png` with `{col}` being the column number and `{row}` the row number of the tile. Row/column numbers start at 0 and the origin is in the top left corner of the sat-image. So the image `sat/0/0.png` is the most top left tile of the satellite image.   
 
-The `sat/tiles/` directory contains an additional zoom pyramid in the form `{zoom}/{col}/{row}.png`. Zoom `0` is the full-resolution satellite image split into 512 pixel tiles. Each following zoom level halves the image dimensions.
+The `sat/tiles/` directory contains an additional zoom pyramid in the form `{zoom}/{col}/{row}.png`. Tiles are 256 by 256 pixels. Zoom `0` is the most zoomed-out overview level. Each following zoom level doubles the image dimensions, so higher zoom numbers are more zoomed in.
 
 Take a look at the following image for a visual representation:  
 ![](./assets/sat_tiles.svg)  
@@ -41,12 +41,14 @@ Take a look at the following image for a visual representation:
 ## 6. `topo/` directory
 The `topo/` directory includes a generated topographic raster image based on the map's elevation data.
 
-`topo/full.png` contains the generated full topographic image. The `topo/tiles/` directory contains the same zoom pyramid layout as the satellite zoom tiles: `{zoom}/{col}/{row}.png`.
+The `topo/tiles/` directory contains generated topographic tiles with the same zoom pyramid layout as the satellite zoom tiles: `{zoom}/{col}/{row}.png`. The maximum zoom level is rendered at 1 pixel per meter. `topo_dark/tiles/` contains the dark-mode topographic equivalent.
 
 ## 7. `baked_topo/` directory
 The `baked_topo/` directory includes a rendered topographic raster with available map features baked into the image.
 
-`baked_topo/full.png` contains the generated full baked image. The `baked_topo/tiles/` directory contains the same zoom pyramid layout as the satellite zoom tiles: `{zoom}/{col}/{row}.png`.
+The `baked_topo/tiles/` directory contains generated baked topographic tiles with the same zoom pyramid layout as the satellite zoom tiles: `{zoom}/{col}/{row}.png`. `baked_topo_dark/tiles/` contains the dark-mode baked topographic equivalent.
+
+The baked image starts from the generated topographic raster and burns available WRP-native map features into it, currently including building polygons, road network lines, powerline segments, and river polygons.
 
 ## 8. `dem.asc.gz`
 The `dem.asc.gz` includes the [digital elevation model](https://en.wikipedia.org/wiki/Digital_elevation_model) of the map. The file is a gzipped ascii file and in the [ESRI ASCII Raster Format](https://desktop.arcgis.com/de/arcmap/10.3/manage-data/raster-and-images/esri-ascii-raster-format.htm). 

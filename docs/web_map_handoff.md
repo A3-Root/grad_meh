@@ -15,7 +15,7 @@ Required tools:
 - Ninja
 - Conan compatible with the repo lockfile/profile
 - Rust toolchain, used by `src/arma-file-formats-cxx`
-- HEMTT compatible with this repository's `hemtt.toml` layout, or a migrated HEMTT v1 `.hemtt/project.toml`
+- HEMTT
 
 From the VS Code terminal:
 
@@ -75,10 +75,12 @@ grad_meh/{worldName}/
     3/3.png
     tiles/{z}/{x}/{y}.png
   topo/
-    full.png
+    tiles/{z}/{x}/{y}.png
+  topo_dark/
     tiles/{z}/{x}/{y}.png
   baked_topo/
-    full.png
+    tiles/{z}/{x}/{y}.png
+  baked_topo_dark/
     tiles/{z}/{x}/{y}.png
   geojson/
     roads/*.geojson.gz
@@ -93,21 +95,25 @@ Satellite:
 
 - Legacy 4 by 4 tiles remain in `sat/{x}/{y}.png`.
 - Multi-zoom tiles are in `sat/tiles/{z}/{x}/{y}.png`.
-- `z = 0` is the full-resolution source image split into 512 pixel tiles.
-- Each following zoom level halves image width and height.
+- Tiles are 256 by 256 pixels.
+- `z = 0` is the most zoomed-out overview level.
+- Each following zoom level doubles the image width and height, so larger `z` values are more zoomed in.
+- Topographic layers are rendered at 1 pixel per meter at their maximum zoom level.
 
 Topographic:
 
-- `topo/full.png` is a generated raster from elevation data.
-- `topo/tiles/{z}/{x}/{y}.png` uses the same 512 pixel tile pyramid as satellite.
+- `topo/tiles/{z}/{x}/{y}.png` is generated from elevation data.
+- `topo/tiles/{z}/{x}/{y}.png` uses the same 256 pixel tile pyramid as satellite.
+- `topo_dark/tiles/{z}/{x}/{y}.png` is the dark-mode topographic equivalent.
 - The topo renderer currently uses elevation tinting, hillshade, and contour lines from the WRP elevation grid. It is not a capture of the in-game paper map.
 
 Baked topography:
 
-- `baked_topo/full.png` starts from the generated topo raster.
-- `baked_topo/tiles/{z}/{x}/{y}.png` uses the same 512 pixel tile pyramid.
-- The current baked renderer draws available WRP-native map features into the raster, including house/building polygons, powerlines, and river polygons.
-- Roads are still exported as GeoJSON and should be overlaid by the web map, or baked later by a server-side renderer that consumes `geojson/roads/*.geojson.gz`.
+- `baked_topo/tiles/{z}/{x}/{y}.png` starts from the generated topo raster.
+- `baked_topo/tiles/{z}/{x}/{y}.png` uses the same 256 pixel tile pyramid.
+- `baked_topo_dark/tiles/{z}/{x}/{y}.png` is the dark-mode baked topographic equivalent.
+- The current baked renderer draws available WRP-native map features into the raster, including house/building polygons, road network lines, powerlines, and river polygons.
+- Detailed road classes are still exported as GeoJSON and can be overlaid by the web map from `geojson/roads/*.geojson.gz`.
 
 Tile coordinates use image-space origin:
 

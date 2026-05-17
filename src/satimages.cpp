@@ -19,12 +19,27 @@ void writeImagePyramid(const ImageBuf& src, const fs::path& basePath, const int3
         fs::create_directories(basePath);
     }
 
+    std::vector<ImageBuf> levels;
     auto levelImage = src.copy(TypeDesc::UINT8);
-    int32_t z = 0;
 
-    while (levelImage.spec().width >= tileSize || levelImage.spec().height >= tileSize || z == 0) {
+    while (levelImage.spec().width >= tileSize || levelImage.spec().height >= tileSize || levels.empty()) {
+        levels.push_back(levelImage.copy(TypeDesc::UINT8));
+
         const auto width = levelImage.spec().width;
         const auto height = levelImage.spec().height;
+        const auto nextWidth = std::max(1, width / 2);
+        const auto nextHeight = std::max(1, height / 2);
+        if (nextWidth == width && nextHeight == height) {
+            break;
+        }
+
+        levelImage = ImageBufAlgo::resize(levelImage, "", 0, ROI(0, nextWidth, 0, nextHeight));
+    }
+
+    for (int32_t level = static_cast<int32_t>(levels.size()) - 1, z = 0; level >= 0; level--, z++) {
+        const auto& image = levels[static_cast<size_t>(level)];
+        const auto width = image.spec().width;
+        const auto height = image.spec().height;
         const auto cols = static_cast<int32_t>(std::ceil(static_cast<float>(width) / tileSize));
         const auto rows = static_cast<int32_t>(std::ceil(static_cast<float>(height) / tileSize));
 
@@ -40,26 +55,17 @@ void writeImagePyramid(const ImageBuf& src, const fs::path& basePath, const int3
             }
 
             for (int32_t y = 0; y < rows; y++) {
-                ImageBuf tile(ImageSpec(tileSize, tileSize, levelImage.spec().nchannels, TypeDesc::UINT8));
+                ImageBuf tile(ImageSpec(tileSize, tileSize, image.spec().nchannels, TypeDesc::UINT8));
                 auto roi = ROI(
                     x * tileSize,
                     std::min((x + 1) * tileSize, width),
                     y * tileSize,
                     std::min((y + 1) * tileSize, height));
-                auto cut = ImageBufAlgo::cut(levelImage, roi);
+                auto cut = ImageBufAlgo::cut(image, roi);
                 ImageBufAlgo::paste(tile, 0, 0, 0, 0, cut);
                 tile.write((xPath / std::to_string(y).append(".png")).string());
             }
         }
-
-        const auto nextWidth = std::max(1, width / 2);
-        const auto nextHeight = std::max(1, height / 2);
-        if (nextWidth == width && nextHeight == height) {
-            break;
-        }
-
-        levelImage = ImageBufAlgo::resize(levelImage, "", 0, ROI(0, nextWidth, 0, nextHeight));
-        z++;
     }
 }
 

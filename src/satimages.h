@@ -27,5 +27,5 @@ struct CmpTileTransform
 };
 
 void writeSatImages(arma_file_formats::cxx::OprwCxx& wrp, const int32_t& worldSize, std::filesystem::path& basePathSat, const std::string& worldName);
-void writeImagePyramid(const OpenImageIO_v2_5::ImageBuf& src, const std::filesystem::path& basePath, const int32_t tileSize = 512);
+void writeImagePyramid(const OpenImageIO_v2_5::ImageBuf& src, const std::filesystem::path& basePath, const int32_t tileSize = 256);
 TileTransform getTileTransform(rust::Box<arma_file_formats::cxx::CfgCxx>& rap);

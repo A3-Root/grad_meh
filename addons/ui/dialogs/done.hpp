@@ -6,12 +6,12 @@
 class grad_meh_done {
 	idd = -1;
 	onUnLoad = "call (uiNamespace getVariable 'grad_meh_fnc_done_onUnLoad');";
-	movingEnable = false;
+	movingEnable = 0;
 	#include "base\start.hpp"
 	class text: ctrlStructuredText {
 		idc = IDC_DONE_TEXT;
-		x = 0 + GRID_W;
-		y = 0 + GRID_H;
+		x = QUOTE(0 + GRID_W);
+		y = QUOTE(0 + GRID_H);
 		w = QUOTE(DIALOG_WIDTH - GRID_W * 2);
 		h = QUOTE(DIALOG_HEIGHT - GRID_H * 2);
 		text = "";
@@ -20,7 +20,7 @@ class grad_meh_done {
 		{
 			align = "center";
 			valign = "middle";
-			size = 1 * GRID_H;
+			size = QUOTE(1 * GRID_H);
 		};
 	};
 	#include "base\end.hpp"

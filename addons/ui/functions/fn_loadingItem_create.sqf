@@ -36,7 +36,7 @@ private _displayName = [(configFile >> "CfgWorlds" >> _worldName), "description"
 
 private _error = [(uiNamespace getVariable ["grad_meh_errors", []]), _worldName, ""] call (uiNamespace getVariable "BIS_fnc_getFromPairs");
 
-if !(_error isEqualTo "") exitWith {
+if (_error isNotEqualTo "") exitWith {
 	private _item = _display ctrlCreate ['grad_meh_loadingItem_error', -1, _parentGrp];
 
 	// set name text and color to purple
@@ -66,7 +66,7 @@ private _runningAnim = {
 	private _box = _stepCtrl controlsGroupCtrl IDC_LOADINGSTEP_PICTURE;
 
 	private _dir = 180;
-	while {!(_box isEqualTo controlNull)} do {
+	while {_box isNotEqualTo controlNull} do {
 		if (_box isEqualTo controlNull) exitWith {};
 		_box ctrlSetAngle [_dir, 0.5, 0.5, false];
 		_box ctrlCommit 0.7;
@@ -84,7 +84,7 @@ private _allDone = true;
 	private _status = [_worldName, _step] call (uiNamespace getVariable "grad_meh_fnc_stepStatus");
 	private _stepCtrl = _item controlsGroupCtrl _idc;
 
-	if !(_stepCtrl isEqualTo controlNull) then {
+	if (_stepCtrl isNotEqualTo controlNull) then {
 		if (_status isEqualTo "done") then {
 			(_stepCtrl controlsGroupCtrl IDC_LOADINGSTEP_PICTURE) ctrlSetText DONE_TEXTURE;
 			(_stepCtrl controlsGroupCtrl IDC_LOADINGSTEP_TEXT) ctrlSetTextColor [0.4, 0.667, 0.4, 1];
@@ -106,7 +106,7 @@ private _allDone = true;
 if (_allDone) then {
 	// set name color to green
 	private _nameCtrl = (_item controlsGroupCtrl IDC_LOADINGITEM_NAME);
-	if !(_nameCtrl isEqualTo controlNull) then {
+	if (_nameCtrl isNotEqualTo controlNull) then {
 		_nameCtrl ctrlSetTextColor [0.4, 0.667, 0.4, 1];
 	};
 };

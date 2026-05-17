@@ -26,6 +26,7 @@ class ctrlStaticFooter;
 class ctrlButtonOK;
 class ctrlButtonClose;
 class ctrlButtonCancel;
+class Attributes;
 
 #include "idcmacros.hpp"
 

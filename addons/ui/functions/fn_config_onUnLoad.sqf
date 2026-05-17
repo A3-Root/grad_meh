@@ -18,7 +18,7 @@ if (_exitCode isEqualTo 1) then {
 	// user pressed ok
 
 	// check if any option is selected
-	if (({_x} count _options) isEqualTo 0) then{
+	if (_options findIf {_x} isEqualTo -1) then {
 		(displayParent _display) spawn { _this createDisplay "grad_meh_config"; };
 	} else {
 		// start export
@@ -38,5 +38,4 @@ if (_exitCode isEqualTo 1) then {
 	// user pressed cancel -> open main display
 	(displayParent _display) spawn { _this createDisplay "grad_meh_main"; };
 };
-
 

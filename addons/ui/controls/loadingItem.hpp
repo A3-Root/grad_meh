@@ -5,22 +5,22 @@
 #define STEP_Y(index) ((NAME_HEIGHT + index * LOADING_STEP_H) * GRID_H)
 
 class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
-	x = SPACING * GRID_W;
-	y = SPACING * GRID_H;
+	x = QUOTE(SPACING * GRID_W);
+	y = QUOTE(SPACING * GRID_H);
 	w = LOADING_STEP_W;
-	h = STEP_Y(8) + BOTTOM_MARGIN * GRID_H;
+	h = QUOTE(STEP_Y(8) + BOTTOM_MARGIN * GRID_H);
 	class Controls {
 		class name: ctrlStatic {
 			idc = IDC_LOADINGITEM_NAME;
 			x = 0;
 			y = 0;
 			w = LOADING_STEP_W;
-			h = NAME_HEIGHT * GRID_H;
-			sizeEx = NAME_HEIGHT * GRID_H
+			h = QUOTE(NAME_HEIGHT * GRID_H);
+			sizeEx = QUOTE(NAME_HEIGHT * GRID_H);
 		};
 		class readWrp: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_READWRP;
-			y = STEP_Y(0);
+			y = QUOTE(STEP_Y(0));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -30,7 +30,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class satImage: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_SATIMAGE;
-			y = STEP_Y(1);
+			y = QUOTE(STEP_Y(1));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -40,7 +40,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class topoImage: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_TOPOIMAGE;
-			y = STEP_Y(2);
+			y = QUOTE(STEP_Y(2));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -50,7 +50,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class bakedTopoImage: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_BAKEDTOPOIMAGE;
-			y = STEP_Y(3);
+			y = QUOTE(STEP_Y(3));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -60,7 +60,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class houses: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_HOUSES;
-			y = STEP_Y(4);
+			y = QUOTE(STEP_Y(4));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -70,7 +70,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class previewImage: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_PREVIEWIMGE;
-			y = STEP_Y(5);
+			y = QUOTE(STEP_Y(5));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -80,7 +80,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class meta: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_META;
-			y = STEP_Y(6);
+			y = QUOTE(STEP_Y(6));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -90,7 +90,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 		};
 		class dem: grad_meh_loadingStep {
 			idc = IDC_LOADINGITEM_STEP_DEM;
-			y = STEP_Y(7);
+			y = QUOTE(STEP_Y(7));
 			class Controls: Controls {
 				class done: done {};
 				class text: text {
@@ -102,21 +102,21 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 };
 
 class grad_meh_loadingItem_error: grad_meh_loadingItem {
-	h = STEP_Y(1) + BOTTOM_MARGIN * GRID_H;
+	h = QUOTE(STEP_Y(1) + BOTTOM_MARGIN * GRID_H);
 	class Controls {
 		class name: ctrlStatic {
 			idc = IDC_LOADINGITEM_NAME;
 			x = 0;
 			y = 0;
 			w = LOADING_STEP_W;
-			h = NAME_HEIGHT * GRID_H;
-			sizeEx = NAME_HEIGHT * GRID_H
+			h = QUOTE(NAME_HEIGHT * GRID_H);
+			sizeEx = QUOTE(NAME_HEIGHT * GRID_H);
 		};
 		class error: name {
 			idc = IDC_LOADINGITEM_ERROR;
-			y = STEP_Y(0);
-			h = LOADING_STEP_H * GRID_H;
-			sizeEx = LOADING_STEP_H * 0.9 * GRID_H;
+			y = QUOTE(STEP_Y(0));
+			h = QUOTE(LOADING_STEP_H * GRID_H);
+			sizeEx = QUOTE(LOADING_STEP_H * 0.9 * GRID_H);
 		};
 	};
 };

@@ -64,3 +64,4 @@ releases/*
 keys/*
 *.pbo
 *.biprivatekey
+.hemttprivatekey

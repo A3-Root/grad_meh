@@ -100,7 +100,7 @@ playScriptedMission [
 				private _startedOrAborted = false;
 
 				while { !_startedOrAborted } do {
-					private _status = gradMehExportMap [
+					private _exportArgs = [
 						_x,
 						_exportSat,
 						_exportTopo,
@@ -110,6 +110,7 @@ playScriptedMission [
 						_exportMeta,
 						_exportDem
 					];
+					private _status = call compile ("gradMehExportMap " + str _exportArgs);
 
 					switch (_status) do {
 						case GRAD_MEH_STATUS_OK: {
@@ -162,6 +163,6 @@ private _zero = findDisplay(0);
 	if (_x != _zero) then {
 		_x closeDisplay 1;
 	};
-} foreach allDisplays;
+} forEach allDisplays;
 
 failMission "END1";

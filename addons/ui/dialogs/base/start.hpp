@@ -18,10 +18,10 @@
 class ControlsBackground {
 	class background: ctrlStatic {
 		colorBackground[] = {0.5, 0.5, 0.5,1};
-		x = safezoneX;
-		y = safezoneY;
-		w = safezoneW;
-		h = safezoneH;
+		x = QUOTE(safezoneX);
+		y = QUOTE(safezoneY);
+		w = QUOTE(safezoneW);
+		h = QUOTE(safezoneH);
 	};
 
 	class dialog_background: ctrlStaticBackground {

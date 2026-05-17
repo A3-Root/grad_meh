@@ -4,7 +4,7 @@
 
 class grad_meh_main {
 	idd = -1;
-	movingEnable = false;
+	movingEnable = 0;
 	onLoad = "call (uiNamespace getVariable 'grad_meh_fnc_main_onLoad');";
 	onUnLoad = "call (uiNamespace getVariable 'grad_meh_fnc_main_onUnLoad');";
 	#include "base\start.hpp"

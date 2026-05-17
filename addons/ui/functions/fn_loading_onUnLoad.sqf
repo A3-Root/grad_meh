@@ -1,6 +1,6 @@
 params ["_display", "_exitCode"];
 
-if !(_exitCode isEqualTo 2) exitWith {};
+if (_exitCode isNotEqualTo 2) exitWith {};
 
 private _maps = _display getVariable ["grad_meh_worlds", []];
 

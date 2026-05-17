@@ -19,7 +19,7 @@ if (_exitCode isEqualTo 1) then {
 		(displayParent _display) spawn { _this createDisplay "grad_meh_main"; };
 	} else {
 		(displayParent _display) spawn { _this createDisplay "grad_meh_config"; };
-	}
+	};
 } else {
 	// user pressed cancel
 	[displayParent _display] spawn {
@@ -36,6 +36,6 @@ if (_exitCode isEqualTo 1) then {
 		if (_result) exitWith {};
 
 		// create loading display
-		private _loadingDisplay = _parent createDisplay "grad_meh_main";
+		_parent createDisplay "grad_meh_main";
 	};
-}
+};

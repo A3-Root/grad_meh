@@ -35,6 +35,8 @@ Each tile within the `sat/` directory has the following nomenclature `{col}/{row
 
 The `sat/tiles/` directory contains an additional zoom pyramid in the form `{zoom}/{col}/{row}.png`. Tiles are 256 by 256 pixels. Zoom `0` is the most zoomed-out overview level. Each following zoom level doubles the image dimensions, so higher zoom numbers are more zoomed in.
 
+`sat_dark/tiles/` contains the dark-mode satellite equivalent. `baked_sat/tiles/` and `baked_sat_dark/tiles/` contain satellite rasters with available WRP-native map features burned into the image.
+
 Take a look at the following image for a visual representation:  
 ![](./assets/sat_tiles.svg)  
   

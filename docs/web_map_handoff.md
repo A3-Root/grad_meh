@@ -74,6 +74,12 @@ grad_meh/{worldName}/
     ...
     3/3.png
     tiles/{z}/{x}/{y}.png
+  sat_dark/
+    tiles/{z}/{x}/{y}.png
+  baked_sat/
+    tiles/{z}/{x}/{y}.png
+  baked_sat_dark/
+    tiles/{z}/{x}/{y}.png
   topo/
     tiles/{z}/{x}/{y}.png
   topo_dark/
@@ -95,6 +101,8 @@ Satellite:
 
 - Legacy 4 by 4 tiles remain in `sat/{x}/{y}.png`.
 - Multi-zoom tiles are in `sat/tiles/{z}/{x}/{y}.png`.
+- `sat_dark/tiles/{z}/{x}/{y}.png` is the dark-mode satellite equivalent.
+- `baked_sat/tiles/{z}/{x}/{y}.png` and `baked_sat_dark/tiles/{z}/{x}/{y}.png` burn WRP-native map features into the satellite raster.
 - Tiles are 256 by 256 pixels.
 - `z = 0` is the most zoomed-out overview level.
 - Each following zoom level doubles the image width and height, so larger `z` values are more zoomed in.

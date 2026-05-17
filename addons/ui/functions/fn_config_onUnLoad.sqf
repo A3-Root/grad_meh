@@ -9,8 +9,9 @@ private _exportHouses = cbChecked (_display displayCtrl IDC_CONFIG_CHECK_HOUSES)
 private _exportPreviewImg = cbChecked (_display displayCtrl IDC_CONFIG_CHECK_PREVIEW);
 private _exportMeta = cbChecked (_display displayCtrl IDC_CONFIG_CHECK_META);
 private _exportDem = cbChecked (_display displayCtrl IDC_CONFIG_CHECK_DEM);
+private _exportArmaTopo = cbChecked (_display displayCtrl IDC_CONFIG_CHECK_ARMA_TOPO);
 
-private _options = [_exportSat, _exportTopo, _exportBakedTopo, _exportHouses, _exportPreviewImg, _exportMeta, _exportDem];
+private _options = [_exportSat, _exportTopo, _exportBakedTopo, _exportHouses, _exportPreviewImg, _exportMeta, _exportDem, _exportArmaTopo];
 
 uiNamespace setVariable ["grad_meh_options", _options];
 
@@ -30,7 +31,8 @@ if (_exitCode isEqualTo 1) then {
 			_exportHouses,
 			_exportPreviewImg,
 			_exportMeta,
-			_exportDem
+			_exportDem,
+			_exportArmaTopo
 		] call (uiNamespace getVariable "grad_meh_fnc_export");
 	};
 

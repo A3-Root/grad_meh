@@ -29,7 +29,8 @@ private _STEPS = [
 	["write_houses", IDC_LOADINGITEM_STEP_HOUSES],
 	["write_preview", IDC_LOADINGITEM_STEP_PREVIEWIMGE],
 	["write_meta", IDC_LOADINGITEM_STEP_META],
-	["write_dem", IDC_LOADINGITEM_STEP_DEM]
+	["write_dem", IDC_LOADINGITEM_STEP_DEM],
+	["write_arma_topo", IDC_LOADINGITEM_STEP_ARMA_TOPO]
 ];
 
 private _displayName = [(configFile >> "CfgWorlds" >> _worldName), "description", ""] call (uiNamespace getVariable "BIS_fnc_returnConfigEntry");

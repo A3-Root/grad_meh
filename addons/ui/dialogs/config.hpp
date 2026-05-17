@@ -1,7 +1,7 @@
 #define ROW_HEIGHT 3
 #define ROW_Y(index) ((SPACING + index * ROW_HEIGHT) * GRID_H)
 #define DIALOG_WIDTH (50 * GRID_W)
-#define DIALOG_HEIGHT (ROW_Y(7) + SPACING * GRID_H)
+#define DIALOG_HEIGHT (ROW_Y(8) + SPACING * GRID_H)
 #define DIALOG_TITLE "Gruppe Adler MEH"
 #define DIALOG_NON_SCROLLABLE true
 
@@ -100,6 +100,17 @@ class grad_meh_config {
 			};
 			class text: text {
 				text = "Export digital elevation model";
+			};
+		};
+	};
+	class armaTopo: sat {
+		y = QUOTE(ROW_Y(7));
+		class Controls: Controls {
+			class check: check {
+				idc = IDC_CONFIG_CHECK_ARMA_TOPO;
+			};
+			class text: text {
+				text = "Export Arma map SVG topo source";
 			};
 		};
 	};

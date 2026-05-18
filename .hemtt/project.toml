@@ -3,6 +3,10 @@ prefix = "grad_meh"
 mainprefix = "x"
 author = "Gruppe Adler"
 folder_optionals = false
+
+[version]
+git_hash = 0
+
 [files]
 include = [
     "mod.cpp",

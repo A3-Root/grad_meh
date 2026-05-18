@@ -8,7 +8,7 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 	x = QUOTE(SPACING * GRID_W);
 	y = QUOTE(SPACING * GRID_H);
 	w = LOADING_STEP_W;
-	h = QUOTE(STEP_Y(9) + BOTTOM_MARGIN * GRID_H);
+	h = QUOTE(STEP_Y(8) + BOTTOM_MARGIN * GRID_H);
 	class Controls {
 		class name: ctrlStatic {
 			idc = IDC_LOADINGITEM_NAME;
@@ -95,16 +95,6 @@ class grad_meh_loadingItem: ctrlControlsGroupNoScrollbars {
 				class done: done {};
 				class text: text {
 					text = "Export digital elevation model";
-				};
-			};
-		};
-		class armaTopo: grad_meh_loadingStep {
-			idc = IDC_LOADINGITEM_STEP_ARMA_TOPO;
-			y = QUOTE(STEP_Y(8));
-			class Controls: Controls {
-				class done: done {};
-				class text: text {
-					text = "Export Arma map SVG";
 				};
 			};
 		};

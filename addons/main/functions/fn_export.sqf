@@ -11,7 +11,6 @@
  * 5: Export preview image (Optional, Default: true) <BOOLEAN>
  * 6: Export meta.json (Optional, Default: true) <BOOLEAN>
  * 7: Export digital elevation model (Optional, Default: true) <BOOLEAN>
- * 8: Export Arma diagnostic map SVG topo source (Optional, Default: true) <BOOLEAN>
  *
  * Return Value:
  * NONE
@@ -32,8 +31,7 @@ params [
 	["_exportHouses", true, [true]],
 	["_exportPreviewImg", true, [true]],
 	["_exportMeta", true, [true]],
-	["_exportDem", true, [true]],
-	["_exportArmaTopo", true, [true]]
+	["_exportDem", true, [true]]
 ];
 
 // reset progess
@@ -55,11 +53,8 @@ if (!_exportHouses) then { ["write_houses", _maps] call _cancelSteps; };
 if (!_exportPreviewImg) then { ["write_preview", _maps] call _cancelSteps; };
 if (!_exportMeta) then { ["write_meta", _maps] call _cancelSteps; };
 if (!_exportDem) then { ["write_dem", _maps] call _cancelSteps; };
-if (!_exportArmaTopo) then { ["write_arma_topo", _maps] call _cancelSteps; };
 
 uiNamespace setVariable ["grad_meh_exportOptions", +_this];
-uiNamespace setVariable ["grad_meh_exportPhase", ["capture_svg", "bulk_export"] select (!_exportArmaTopo || {_maps isEqualTo []})];
-uiNamespace setVariable ["grad_meh_exportMapIndex", 0];
 
 disableSerialization;
 
@@ -81,8 +76,7 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 					["_exportHouses", true, [true]],
 					["_exportPreviewImg", true, [true]],
 					["_exportMeta", true, [true]],
-					["_exportDem", true, [true]],
-					["_exportArmaTopo", true, [true]]
+					["_exportDem", true, [true]]
 				];
 
 				private _closeAndEndMission = {
@@ -113,45 +107,21 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 				_loadingDisplay setVariable ["grad_meh_worlds", _maps];
 				[_loadingDisplay] call (uiNamespace getVariable "grad_meh_fnc_loading_redraw");
 
-				private _phase = uiNamespace getVariable ["grad_meh_exportPhase", "bulk_export"];
-				if (_phase isEqualTo "capture_svg") exitWith {
-					private _index = uiNamespace getVariable ["grad_meh_exportMapIndex", 0];
-					private _currentMap = _maps select _index;
-
-					if (isNil "BIS_fnc_diagRadio") then {
-						{
-							[_x, "write_arma_topo", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
-						} forEach _maps;
-						[_currentMap, "Arma map SVG export requires the diagnostic executable / development branch."] call _reportError;
-						uiNamespace setVariable ["grad_meh_exportPhase", "bulk_export"];
-						["VR"] call (uiNamespace getVariable "grad_meh_fnc_exportStartMission");
-						call _closeAndEndMission;
-					};
-
-					[_currentMap, "write_arma_topo", "running"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
-					private _svgPath = call compile ("gradMehPrepareArmaTopoSvg " + str _currentMap);
-					if (_svgPath isEqualType "" && {_svgPath isNotEqualTo ""}) then {
-						call compile ("diag_exportTerrainSVG [" + str _svgPath + ", true, false, true, true, true, false]");
-						[_currentMap, "write_arma_topo", "done"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
-					} else {
-						[_currentMap, "write_arma_topo", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
-						[_currentMap, "Could not prepare Arma map SVG output path."] call _reportError;
-					};
-
-					private _nextIndex = _index + 1;
-					uiNamespace setVariable ["grad_meh_exportMapIndex", _nextIndex];
-					if (_nextIndex < count _maps) then {
-						[_maps select _nextIndex] call (uiNamespace getVariable "grad_meh_fnc_exportStartMission");
-					} else {
-						uiNamespace setVariable ["grad_meh_exportPhase", "bulk_export"];
-						["VR"] call (uiNamespace getVariable "grad_meh_fnc_exportStartMission");
-					};
-					call _closeAndEndMission;
-				};
-
 				{
 					private _startedOrAborted = false;
 					while { !_startedOrAborted } do {
+						if (isNil "gradMehExportMap") exitWith {
+							_startedOrAborted = true;
+							[_x, "write_sat", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_topo", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_baked_topo", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_houses", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_preview", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_meta", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "write_dem", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
+							[_x, "gradMehExportMap is unavailable. Intercept did not initialize or grad_meh_x64.dll was not loaded."] call _reportError;
+						};
+
 						private _exportArgs = [
 							_x,
 							_exportSat,
@@ -160,11 +130,10 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 							_exportHouses,
 							_exportPreviewImg,
 							_exportMeta,
-							_exportDem,
-							_exportArmaTopo
+							_exportDem
 						];
 
-						private _status = call compile ("gradMehExportMap " + str _exportArgs);
+						private _status = call compile ("gradMehExportMap (" + str _exportArgs + ")");
 
 						switch (_status) do {
 							case GRAD_MEH_STATUS_OK: { _startedOrAborted = true; };
@@ -196,9 +165,14 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 					};
 				} forEach _maps;
 
+				if !(isNil "gradMehExportRunning") then {
+					waitUntil {
+						sleep 5;
+						!(call compile "gradMehExportRunning")
+					};
+				};
+
 				uiNamespace setVariable ["grad_meh_exportOptions", nil];
-				uiNamespace setVariable ["grad_meh_exportPhase", nil];
-				uiNamespace setVariable ["grad_meh_exportMapIndex", nil];
 			};
 		},
 		missionConfigFile,
@@ -206,8 +180,7 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 	];
 }];
 
-private _initialWorld = ["VR", _maps select 0] select (_exportArmaTopo && {_maps isNotEqualTo []});
-[_initialWorld] call (uiNamespace getVariable "grad_meh_fnc_exportStartMission");
+["VR"] call (uiNamespace getVariable "grad_meh_fnc_exportStartMission");
 
 // This is needed for playScriptedMission to work properly
 //Close all displays that could be the background display ... this is essentialy forceEnd command

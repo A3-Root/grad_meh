@@ -32,8 +32,6 @@
 #include <list>
 #include <vector>
 #include <filesystem>
-#include <cstdlib>
-
 #include <nlohmann/json.hpp>
 
 #include <ogr_geometry.h>
@@ -64,229 +62,6 @@ using iet = types::game_state::game_evaluator::evaluator_error_type;
 using SQFPar = game_value_parameter;
 
 static bool gradMehIsRunning = false;
-
-namespace {
-std::string quoteCommandArg(const fs::path& path)
-{
-    auto value = path.string();
-    ba::replace_all(value, "\"", "\\\"");
-    return "\"" + value + "\"";
-}
-
-std::string quoteCommandArg(const std::string& value)
-{
-    auto escaped = value;
-    ba::replace_all(escaped, "\"", "\\\"");
-    return "\"" + escaped + "\"";
-}
-
-const char* armaTopoProcessorScript = R"PY(
-import gzip
-import json
-import os
-import shutil
-import subprocess
-import sys
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
-SVG_NS = "{http://www.w3.org/2000/svg}"
-
-def run(args):
-    print("[grad_meh arma_topo]", " ".join(str(a) for a in args))
-    subprocess.run([str(a) for a in args], check=True)
-
-def find_tool(name):
-    found = shutil.which(name)
-    if found:
-        return found
-    raise RuntimeError(f"Required tool '{name}' was not found on PATH")
-
-def get_items(root, category_id, item_type):
-    group = root.find(f"./{SVG_NS}g[@id='{category_id}']")
-    if group is None:
-        return []
-    return group.findall(f".//{SVG_NS}{item_type}")
-
-def remove_groups(root, keep_terrain):
-    for group in list(root.findall(f"./{SVG_NS}g")):
-        is_terrain = group.get("id") == "terrain"
-        if (keep_terrain and not is_terrain) or ((not keep_terrain) and is_terrain):
-            root.remove(group)
-
-def preprocess_svg(in_file, out_file):
-    tree = ET.parse(in_file)
-    root = tree.getroot()
-    for polyline in get_items(root, "countLines", "polyline"):
-        polyline.set("fill", "none")
-    for polyline in get_items(root, "roads", "polyline"):
-        polyline.set("fill", "none")
-    for polyline in get_items(root, "airports", "polyline"):
-        polyline.set("fill", "none")
-    for ellipse in get_items(root, "objects", "ellipse"):
-        ellipse.set("fill", "none")
-        ellipse.set("stroke", "url(#colorForestBorder)")
-        ellipse.set("rx", "6.00")
-        ellipse.set("ry", "6.00")
-    for polygon in get_items(root, "forests", "polygon"):
-        polygon.set("fill-opacity", "0.2")
-        polygon.set("fill", "#3e6e30")
-    for text in get_items(root, "mountains", "text"):
-        text.set("font-size", "10px")
-        text.set("font-family", "Arial")
-    for text in get_items(root, "townNames", "text"):
-        text.set("font-size", "24px")
-        text.set("font-family", "Arial")
-    tree.write(out_file, encoding="utf-8", xml_declaration=True)
-
-def make_dark_svg(in_file, out_file):
-    tree = ET.parse(in_file)
-    root = tree.getroot()
-    for polyline in get_items(root, "countLines", "polyline"):
-        polyline.set("opacity", "0.5")
-    for land in get_items(root, "terrain", "polygon"):
-        land.set("fill", "#1d2b20")
-    for sea in get_items(root, "terrain", "rect"):
-        sea.set("fill", "#303d6e")
-    for text in get_items(root, "townNames", "text"):
-        text.set("fill", "#EEEEEE")
-        text.set("stroke", "#0f0f0f")
-        text.set("stroke-width", "1px")
-        text.set("font-weight", "bold")
-    for text in get_items(root, "mountains", "text"):
-        text.set("fill", "#EEEEEE")
-    tree.write(out_file, encoding="utf-8", xml_declaration=True)
-
-def make_layer_svg(in_file, out_file, keep_terrain):
-    tree = ET.parse(in_file)
-    remove_groups(tree.getroot(), keep_terrain)
-    tree.write(out_file, encoding="utf-8", xml_declaration=True)
-
-def main():
-    if len(sys.argv) != 4:
-        raise RuntimeError("usage: process_arma_topo.py <map_dir> <world_name> <world_size>")
-
-    map_dir = Path(sys.argv[1])
-    world_name = sys.argv[2].lower()
-    world_size = int(float(sys.argv[3]))
-    source_svg = map_dir / "arma_topo" / "source" / f"{world_name}.svg"
-    source_dem = map_dir / "dem.asc.gz"
-    if not source_svg.exists():
-        raise RuntimeError(f"Missing SVG source: {source_svg}")
-    if not source_dem.exists():
-        raise RuntimeError(f"Missing DEM source: {source_dem}")
-
-    inkscape = find_tool("inkscape")
-    magick = find_tool("magick")
-    gdaldem = find_tool("gdaldem")
-    gdal2tiles = shutil.which("gdal2tiles.py") or shutil.which("gdal2tiles")
-    if not gdal2tiles:
-        raise RuntimeError("Required tool 'gdal2tiles.py' or 'gdal2tiles' was not found on PATH")
-
-    image_size = min(max(world_size, 1024), 32768)
-    zoom_level = 3
-    if image_size >= 2560: zoom_level = 4
-    if image_size >= 5120: zoom_level = 5
-    if image_size >= 10240: zoom_level = 6
-    if image_size >= 16400: zoom_level = 7
-    if image_size >= 32768: zoom_level = 8
-
-    temp_dir = map_dir / "arma_topo" / "temp"
-    temp_dir.mkdir(parents=True, exist_ok=True)
-    proc_svg = temp_dir / f"{world_name}.svg"
-    dark_svg = temp_dir / f"{world_name}_dark.svg"
-    land_svg = temp_dir / f"{world_name}_landonly.svg"
-    noland_svg = temp_dir / f"{world_name}_noland.svg"
-    topo_png = temp_dir / f"{world_name}_topo.png"
-    dark_png = temp_dir / f"{world_name}_topo_dark.png"
-    land_png = temp_dir / f"{world_name}_landonly.png"
-    noland_png = temp_dir / f"{world_name}_noland.png"
-    dem_asc = temp_dir / f"{world_name}.asc"
-    hillshade = temp_dir / f"{world_name}_hillshade.png"
-    hillshade_half = temp_dir / f"{world_name}_hillshade_half.png"
-    topo_relief = temp_dir / f"{world_name}_topo_relief.png"
-    color_relief = temp_dir / f"{world_name}_color_relief.png"
-    palette = temp_dir / "color_relief.cpt"
-
-    with gzip.open(source_dem, "rb") as src, open(dem_asc, "wb") as dst:
-        shutil.copyfileobj(src, dst)
-
-    palette.write_text("-450 35 60 92\n0 128 170 198\n1 184 208 173\n150 214 207 166\n350 221 198 156\n600 235 232 214\nnv 0 0 0 0\n", encoding="utf-8")
-
-    preprocess_svg(source_svg, proc_svg)
-    make_dark_svg(proc_svg, dark_svg)
-    make_layer_svg(proc_svg, land_svg, True)
-    make_layer_svg(proc_svg, noland_svg, False)
-
-    for svg, png in [(proc_svg, topo_png), (dark_svg, dark_png), (land_svg, land_png), (noland_svg, noland_png)]:
-        run([inkscape, "-o", png, f"--export-height={image_size}", f"--export-width={image_size}", svg])
-        run([magick, png, "-alpha", "off", png])
-
-    run([gdaldem, "hillshade", "-alg", "Horn", "-alt", "45", "-multidirectional", "-of", "PNG", dem_asc, hillshade])
-    run([magick, hillshade, "-resize", f"{image_size}x{image_size}", hillshade])
-    run([magick, hillshade, "-alpha", "set", "-channel", "a", "-evaluate", "set", "50%", hillshade_half])
-    run([magick, land_png, hillshade_half, "-compose", "multiply", "-composite", topo_relief])
-    run([magick, topo_relief, noland_png, "-composite", topo_relief])
-
-    run([gdaldem, "color-relief", "-of", "PNG", dem_asc, palette, color_relief])
-    run([magick, color_relief, "-resize", f"{image_size}x{image_size}", color_relief])
-    run([magick, color_relief, hillshade_half, "-compose", "multiply", "-composite", color_relief])
-    run([magick, color_relief, noland_png, "-composite", color_relief])
-
-    layers = [
-        (topo_png, map_dir / "arma_topo" / "tiles"),
-        (dark_png, map_dir / "arma_topo_dark" / "tiles"),
-        (topo_relief, map_dir / "arma_topo_relief" / "tiles"),
-        (color_relief, map_dir / "arma_color_relief" / "tiles"),
-    ]
-    for image, target in layers:
-        if target.exists():
-            shutil.rmtree(target)
-        target.mkdir(parents=True, exist_ok=True)
-        run([gdal2tiles, "-p", "raster", "--xyz", "-z", f"0-{zoom_level}", "-w", "none", "-r", "lanczos", image, target])
-
-    metadata = {
-        "worldName": world_name,
-        "worldSize": world_size,
-        "imageSize": image_size,
-        "maxZoom": zoom_level,
-        "layers": ["arma_topo", "arma_topo_dark", "arma_topo_relief", "arma_color_relief"],
-    }
-    (map_dir / "arma_topo" / "process_meta.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-
-if __name__ == "__main__":
-    main()
-)PY";
-
-bool processArmaTopo(const fs::path& basePath, const std::string& lowerWorldName, const int32_t worldSize)
-{
-    const auto toolsPath = fs::path("grad_meh") / "tools";
-    if (!fs::exists(toolsPath)) {
-        fs::create_directories(toolsPath);
-    }
-
-    const auto scriptPath = toolsPath / "process_arma_topo.py";
-    {
-        std::ofstream scriptOut(scriptPath, std::ios::binary);
-        scriptOut << armaTopoProcessorScript;
-    }
-
-    const auto dockerCommand = "docker run --rm"
-        " -v " + quoteCommandArg(fs::absolute(basePath).string() + ":/data/map")
-        + " -v " + quoteCommandArg(fs::absolute(scriptPath).string() + ":/app/process_arma_topo.py:ro")
-        + " grad-meh-arma-topo:latest"
-        + " python3 /app/process_arma_topo.py /data/map"
-        + " " + quoteCommandArg(lowerWorldName)
-        + " " + quoteCommandArg(std::to_string(worldSize));
-
-    const auto result = std::system(dockerCommand.c_str());
-    if (result != 0) {
-        PLOG_ERROR << fmt::format("Docker Arma topo processor failed with exit code {}", result);
-        return false;
-    }
-    return true;
-}
-}
 
 int intercept::api_version() { // This is required for the plugin to work.
     return INTERCEPT_SDK_API_VERSION;
@@ -455,7 +230,7 @@ bool writePreviewImage(const std::string &worldName, std::filesystem::path &base
     }
 }
 
-void extractMap(const std::string &worldName, const std::string &worldPath, std::array<bool, 8> &steps)
+void extractMap(const std::string &worldName, const std::string &worldPath, std::array<bool, 7> &steps)
 {
 
     auto lowerWorldName = boost::algorithm::to_lower_copy(worldName);
@@ -526,7 +301,7 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
         auto wrp = arma_file_formats::cxx::OprwCxx{};
         // wrp.wrpName = worldName + ".wrp";
 
-        if (steps[0] || steps[1] || steps[2] || steps[3] || steps[5] || steps[6] || steps[7])
+        if (steps[0] || steps[1] || steps[2] || steps[3] || steps[5] || steps[6])
         {
             reportStatus(worldName, "read_wrp", "running");
             wrp = arma_file_formats::cxx::create_wrp_from_vec(wrp_data);
@@ -594,21 +369,6 @@ void extractMap(const std::string &worldName, const std::string &worldPath, std:
             writeDem(basePath, wrp, worldSize);
             reportStatus(worldName, "write_dem", "done");
         }
-
-        if (steps[7])
-        {
-            reportStatus(worldName, "write_arma_topo", "running");
-            prettyDiagLog("Processing Arma diagnostic SVG topographic tiles");
-            if (!fs::exists(basePath / "dem.asc.gz")) {
-                prettyDiagLog("Writing dem file required by Arma topographic processor");
-                writeDem(basePath, wrp, worldSize);
-            }
-            if (processArmaTopo(basePath, lowerWorldName, worldSize)) {
-                reportStatus(worldName, "write_arma_topo", "done");
-            } else {
-                reportStatus(worldName, "write_arma_topo", "canceled");
-            }
-        }
     }
     catch (const rust::Error& ex) {
         PLOG_ERROR << "Exception in extract map command";
@@ -625,24 +385,6 @@ game_value exportRunningCommand(game_state &gs) {
     return gradMehIsRunning;
 }
 
-game_value prepareArmaTopoSvgCommand(game_state &gs, SQFPar rightArg)
-{
-    if (rightArg.type_enum() != game_data_type::STRING)
-    {
-        gs.set_script_error(iet::assertion_failed, "Expected a world name string!"sv);
-        return "";
-    }
-
-    auto worldName = ba::to_lower_copy(static_cast<std::string>(r_string(rightArg)));
-    auto sourcePath = fs::path("grad_meh") / worldName / "arma_topo" / "source";
-    if (!fs::exists(sourcePath))
-    {
-        fs::create_directories(sourcePath);
-    }
-
-    return (sourcePath / (worldName + ".svg")).string();
-}
-
 game_value exportMapCommand(game_state &gs, SQFPar rightArg)
 {
 
@@ -654,8 +396,8 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
 
     std::string worldName;
 
-    // [sat image, topo image, baked topo image, houses, preview img, meta.json, dem.asc, Arma topo]
-    std::array<bool, 8> steps = { true, true, true, true, true, true, true, true };
+    // [sat image, topo image, baked topo image, houses, preview img, meta.json, dem.asc]
+    std::array<bool, 7> steps = { true, true, true, true, true, true, true };
 
     if (rightArg.type_enum() == game_data_type::STRING)
     {
@@ -665,7 +407,7 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
     {
         auto parArray = rightArg.to_array();
 
-        if (parArray.size() <= 0 || parArray.size() >= 10)
+        if (parArray.size() <= 0 || parArray.size() >= 9)
         {
             gs.set_script_error(iet::assertion_failed, "Wrong amount of arguments!"sv);
             return GRAD_MEH_STATUS_ERR_ARGS;
@@ -753,7 +495,6 @@ game_value exportMapCommand(game_state &gs, SQFPar rightArg)
 types::registered_sqf_function grad_meh_export_map_string;
 types::registered_sqf_function grad_meh_export_map_array;
 types::registered_sqf_function grad_meh_export_running;
-types::registered_sqf_function grad_meh_prepare_arma_topo_svg;
 
 void intercept::pre_start()
 {
@@ -763,8 +504,6 @@ void intercept::pre_start()
         client::host::register_sqf_command("gradMehExportMap", "Exports the given map", exportMapCommand, game_data_type::SCALAR, game_data_type::ARRAY);
     grad_meh_export_running =
         client::host::register_sqf_command("gradMehExportRunning", "Check if an export is currently running", exportRunningCommand, game_data_type::BOOL);
-    grad_meh_prepare_arma_topo_svg =
-        client::host::register_sqf_command("gradMehPrepareArmaTopoSvg", "Prepare the Arma diagnostic SVG output path for a map", prepareArmaTopoSvgCommand, game_data_type::STRING, game_data_type::STRING);
 
 #if defined(_WIN32)
     std::filesystem::path a3_log_path;

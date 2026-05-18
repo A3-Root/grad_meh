@@ -21,7 +21,7 @@ if !(isNull _textCtrl) then {
 <t size='15'><img image='\x\grad_meh\addons\ui\data\logo_ca.paa'/></t><br />
 <t size='5'>EXPORT FINISHED</t><br />
 <t color='%1' size='1.2'>with %2 errors</t><br />
-<br /><br /><t size='1.2' color='#AAAAAA' v-align='bottom'>%3 LOGS %3</t>
+<br /><br /><t size='1.2' color='#AAAAAA'>%3 LOGS %3</t>
 		"
 	, _errorColor, count _errors, LOGS_ARROW];
 };

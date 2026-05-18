@@ -18,7 +18,9 @@
 
 params ["_worldName", "_step", "_status"];
 
-["grad_meh_progress", _this] call CBA_fnc_localEvent;
+if !(isNil "CBA_fnc_localEvent") then {
+	["grad_meh_progress", _this] call CBA_fnc_localEvent;
+};
 
 private _progress = uiNamespace getVariable ["grad_meh_progress", []];
 

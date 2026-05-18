@@ -1,6 +1,6 @@
 # MEH Web Map Handoff
 
-This document describes how to build the addon, export map data from Arma 3, and consume the output in a web map server/viewer.
+This document describes how to build the stable-branch `grad_meh` addon, export map data from Arma 3, and consume the output in a web map server/viewer. OCAP/diagnostic SVG export now lives in the separate `ocap-renderterrain` repository and addon.
 
 ## Build Instructions
 
@@ -38,7 +38,7 @@ If current HEMTT reports `.hemtt/project.toml not found`, either use the older H
 The addon registers this SQF command:
 
 ```sqf
-gradMehExportMap [mapId, sat, topo, bakedTopo, geojson, previewImg, meta, dem, armaTopo]
+gradMehExportMap [mapId, sat, topo, bakedTopo, geojson, previewImg, meta, dem]
 ```
 
 Arguments:
@@ -51,30 +51,13 @@ Arguments:
 - `previewImg`: export map preview image.
 - `meta`: export `meta.json`.
 - `dem`: export digital elevation model.
-- `armaTopo`: export and process Arma diagnostic SVG map layers into OCAP-style topo tiles.
-
 Example:
 
 ```sqf
-gradMehExportMap ["Stratis", true, true, true, true, true, true, true, true];
+gradMehExportMap ["Stratis", true, true, true, true, true, true, true];
 ```
 
 The UI exposes the same options through checkboxes.
-
-The UI also exposes `Export Arma map SVG topo source`. This is the OCAP-style capture and processing path. When enabled, the export runs in two phases:
-
-1. It launches each selected world as a scripted mission and captures that world's diagnostic SVG with Arma's `diag_exportTerrainSVG`.
-2. It launches VR and runs the normal `grad_meh` WRP/PBO bulk export. During this phase the DLL processes each captured SVG plus `dem.asc.gz` into OCAP-style raster tiles.
-
-The processor always uses Docker and runs the generated processor script in the `grad-meh-arma-topo:latest` image. Host Inkscape/GDAL/ImageMagick installs are intentionally ignored so the output is not affected by local toolchain drift.
-
-Build the Docker image once from the repository root:
-
-```cmd
-docker build -t grad-meh-arma-topo:latest -f tools\arma-topo-render\Dockerfile tools\arma-topo-render
-```
-
-The Windows host only needs `docker` on PATH for the OCAP-style processing phase.
 
 ## Output Layout
 
@@ -103,15 +86,6 @@ grad_meh/{worldName}/
   baked_topo/
     tiles/{z}/{x}/{y}.png
   baked_topo_dark/
-    tiles/{z}/{x}/{y}.png
-  arma_topo/
-    source/{worldName}.svg
-    tiles/{z}/{x}/{y}.png
-  arma_topo_dark/
-    tiles/{z}/{x}/{y}.png
-  arma_topo_relief/
-    tiles/{z}/{x}/{y}.png
-  arma_color_relief/
     tiles/{z}/{x}/{y}.png
   geojson/
     roads/*.geojson.gz
@@ -147,15 +121,6 @@ Baked topography:
 - `baked_topo_dark/tiles/{z}/{x}/{y}.png` is the dark-mode baked topographic equivalent.
 - The current baked renderer draws available WRP-native map features into the raster, including house/building polygons, road network lines, powerlines, and river polygons.
 - Detailed road classes are still exported as GeoJSON and can be overlaid by the web map from `geojson/roads/*.geojson.gz`.
-
-Arma/OCAP-style topography:
-
-- `arma_topo/source/{worldName}.svg` is the raw diagnostic SVG.
-- `arma_topo/tiles/{z}/{x}/{y}.png` is the rasterized Arma paper-map style.
-- `arma_topo_dark/tiles/{z}/{x}/{y}.png` is the dark SVG variant.
-- `arma_topo_relief/tiles/{z}/{x}/{y}.png` composites the Arma non-land features over DEM hillshade.
-- `arma_color_relief/tiles/{z}/{x}/{y}.png` composites the Arma non-land features over DEM color relief.
-- Processing always uses Docker. It requires the `grad-meh-arma-topo:latest` image built from `tools/arma-topo-render/Dockerfile`.
 
 Tile coordinates use image-space origin:
 

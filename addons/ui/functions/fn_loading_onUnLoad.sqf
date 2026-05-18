@@ -7,6 +7,13 @@ private _maps = _display getVariable ["grad_meh_worlds", []];
 [displayParent _display, _maps] spawn {
 	params ["_parent", "_maps"];
 
+	if (isNil "BIS_fnc_guiMessage") exitWith {
+		[] spawn {
+			sleep 0.5;
+			endMission "END1";
+		};
+	};
+
 	private _result = [
 		"Are you sure you want to quit Gruppe Adler MEH?<br/><br/><t size='0.7'>(We recommend restarting your game if you started any export process, to prevent any negative impacts on game performance.)</t>", 
 		"Quit Gruppe Adler MEH",

@@ -25,6 +25,10 @@ if (_exitCode isEqualTo 1) then {
 	[displayParent _display] spawn {
 		params ["_parent"];
 
+		if (isNil "BIS_fnc_guiMessage") exitWith {
+			_parent createDisplay "grad_meh_main";
+		};
+
 		private _result = [
 			"Are you sure you want to quit Gruppe Adler MEH?", 
 			"Quit Gruppe Adler MEH",

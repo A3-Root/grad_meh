@@ -52,20 +52,8 @@ The `baked_topo/tiles/` directory contains generated baked topographic tiles wit
 
 The baked image starts from the generated topographic raster and burns available WRP-native map features into it, currently including building polygons, road network lines, powerline segments, and river polygons.
 
-## 8. `arma_topo/` directory
-The `arma_topo/source/` directory contains the raw Arma diagnostic SVG map export when `Export Arma map SVG topo source` is enabled and the selected world is the currently loaded diagnostic world.
-
-This SVG is the source artifact for OCAP-style rendering. It contains Arma's own paper-map layers such as roads, forests, contour lines, labels, and object symbols.
-
-When Python, Inkscape, GDAL, and ImageMagick are available on PATH, the exporter processes that SVG and `dem.asc.gz` into:
-
-- `arma_topo/tiles/{zoom}/{col}/{row}.png`
-- `arma_topo_dark/tiles/{zoom}/{col}/{row}.png`
-- `arma_topo_relief/tiles/{zoom}/{col}/{row}.png`
-- `arma_color_relief/tiles/{zoom}/{col}/{row}.png`
-
-## 9. `dem.asc.gz`
+## 8. `dem.asc.gz`
 The `dem.asc.gz` includes the [digital elevation model](https://en.wikipedia.org/wiki/Digital_elevation_model) of the map. The file is a gzipped ascii file and in the [ESRI ASCII Raster Format](https://desktop.arcgis.com/de/arcmap/10.3/manage-data/raster-and-images/esri-ascii-raster-format.htm). 
 
-## 10. `preview.png`
+## 9. `preview.png`
 The `preview.png` is the map's preview image (shown in the in-game map selection screen of the editor).

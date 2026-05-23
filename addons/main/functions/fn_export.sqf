@@ -110,7 +110,7 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 				{
 					private _startedOrAborted = false;
 					while { !_startedOrAborted } do {
-						if (isNil "gradMehExportMap") exitWith {
+						if (isNil { call compile "gradMehExportRunning" }) exitWith {
 							_startedOrAborted = true;
 							[_x, "write_sat", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
 							[_x, "write_topo", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
@@ -119,7 +119,7 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 							[_x, "write_preview", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
 							[_x, "write_meta", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
 							[_x, "write_dem", "canceled"] call (uiNamespace getVariable "grad_meh_fnc_updateProgress");
-							[_x, "gradMehExportMap is unavailable. Intercept did not initialize or grad_meh_x64.dll was not loaded."] call _reportError;
+							[_x, "grad_meh native SQF commands are unavailable. Intercept did not initialize or grad_meh_x64.dll was not loaded."] call _reportError;
 						};
 
 						private _exportArgs = [
@@ -165,7 +165,7 @@ uiNamespace setVariable ["grad_meh_fnc_exportStartMission", {
 					};
 				} forEach _maps;
 
-				if !(isNil "gradMehExportRunning") then {
+				if !(isNil { call compile "gradMehExportRunning" }) then {
 					waitUntil {
 						sleep 5;
 						!(call compile "gradMehExportRunning")
